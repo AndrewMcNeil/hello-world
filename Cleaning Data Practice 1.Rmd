@@ -1,0 +1,48 @@
+# Demographic Statistics by Zip Code: 
+
+### https://catalog.data.gov/dataset/demographic-statistics-by-zip-code-acfc9
+
+## Importing .csv file as tbl_df
+```{r}
+dem <- read_csv("desktop/Data Sets/demographic.csv")
+```
+
+## Look at general structure of dataset
+```{r}
+class(dem) #tbl_df
+head(dem)
+str(dem) #Column classes inconsistent
+any(is.na(dem)) #No NAs
+```
+
+## Change first column class to factor and rest to numeric
+```{r}
+dem$`JURISDICTION NAME` <- as.factor(dem$`JURISDICTION NAME`)
+dem[, 2:ncol(dem)] <- lapply(dem[, 2:ncol(dem)], as.numeric)
+str(dem) #Column classes successfully changed
+```
+
+## Remove Percent Columns
+```{r}
+percent_index <- which(str_detect(names(dem), "PERCENT"))
+dem2 <- dem[, -percent_index]
+str(dem2)
+```
+
+## Remove Total Columns
+```{r}
+total_index <- which(str_detect(names(dem2), "TOTAL"))
+dem3 <- dem2[, -total_index]
+str(dem3)
+```
+
+## Change column names
+```{r}
+cnames <- str_replace_all(str_trim(str_replace(tolower(names(dem3)), "count", "")), " ", "_")
+colnames(dem3) <- cnames
+names(dem3)
+str(dem3)
+```
+
+
+
