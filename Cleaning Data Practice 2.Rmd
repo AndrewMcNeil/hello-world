@@ -1,0 +1,60 @@
+#Applications to the Public Service
+
+###http://open.canada.ca/data/en/dataset/7f459f0c-979f-4d2f-b22b-8484571dc543
+
+##Importing .csv file as tbl_df
+```{r}
+apps <- read_csv("desktop/Data Sets/officer.csv")
+print(head(apps))
+```
+
+##Explore structure of dataset
+```{r}
+class(apps) #tbl_df
+str(apps) #columns 3 & 5 are duplicates in French - can be removed
+head(apps) #description column contains variables with column n as values
+any(is.na(apps)) #No NAs
+```
+
+##Remove French duplicate columns and fiscal_year
+```{r}
+apps2 <- apps[, -c(1, 3, 5)]
+str(apps2)
+```
+
+##Change column classes
+```{r}
+apps2[, 1:2] <- lapply(apps2[, 1:2], as.factor)
+str(apps2)
+```
+
+##Spread discription factors into columns
+```{r}
+apps3 <- spread(apps2, description_e, n)
+str(apps3)
+```
+
+##Change column names
+```{r}
+cnames <- str_replace_all(str_replace(tolower(names(apps3)), "_e", ""), " ", "_")
+colnames(apps3) <- cnames
+str(apps3)
+print(head(apps3))
+```
+
+##Check for relationships between variables
+```{r, echo=TRUE}
+ggplot(apps3, aes(number_of_advertisments, number_of_applications)) +
+  geom_point(shape = 2, size = 3) +
+  geom_smooth(method = "lm", se = F)  #positive linear
+
+ggplot(apps3, aes(number_of_applications, number_of_appointments)) + 
+  geom_point(shape = 2, size = 3) +
+  geom_smooth(method = "lm", se = F)  #linear or exponential
+```
+
+
+
+
+
+
